@@ -34,3 +34,7 @@
 ## 清理
 
 验证完成后删除专用测试容器、两个测试数据卷、临时 ZIP 和测试目录、过时测试镜像及测试浏览器标签。保留最终 `codex-deck:local` 镜像、项目源代码和验证截图，不清理其他应用的容器、镜像、数据及 Docker 全局缓存。
+
+## 后续兼容性说明
+
+本次 OrbStack 环境未启用 AppArmor，原验证不覆盖 GitHub Ubuntu runner 的 docker-default AppArmor 策略。后续 CI 报告 bubblewrap 挂载传播被拒绝，已在 Compose 和 CI 的单容器参数中补充 apparmor=unconfined；需重新运行 Ubuntu CI 确认修复，不将原本机验证结果当成 Ubuntu 已通过。

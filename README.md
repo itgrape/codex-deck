@@ -87,7 +87,7 @@ docker compose up -d --no-build
 
 镜像固定 Codex CLI `0.170.0`、cc-connect `1.5.2`，支持构建参数 `CODEX_VERSION` / `CC_CONNECT_VERSION`。构建会验证 CLI 版本；如果 npm 跳过了下载失败的可选平台依赖，会显式补齐官方平台包并校验 SHA-512。版本升级后应重新运行 CI 和原生协议 smoke test。镜像包含 git、bash、ssh client 和 ripgrep；项目特定的 Python、编译器、浏览器等请通过自定义 Dockerfile 扩展。
 
-Compose 仅为 Codex Deck 服务加载 [容器沙箱策略](docker/codex-seccomp.json)，允许原生 Codex 的 bubblewrap 创建嵌套 namespace，并启用 `no-new-privileges`；不修改 Docker 全局默认策略，不添加 capabilities，继续以非 root 用户运行。该配置已在本机容器验证原生命令执行、只读写入拒绝和工作区写入。CI 同时检查宿主机与容器中的原生执行。策略来源、作用范围及 `docker run` 参数见 [docker/README.md](docker/README.md)。
+Compose 仅为 Codex Deck 服务加载 [容器沙箱策略](docker/codex-seccomp.json)，允许原生 Codex 的 bubblewrap 创建嵌套 namespace，并对该服务设置 `apparmor=unconfined` 以兼容 AppArmor 主机，同时启用 `no-new-privileges`；不修改 Docker 全局默认策略，不添加 capabilities，继续以非 root 用户运行。该配置已在本机容器验证原生命令执行、只读写入拒绝和工作区写入。CI 同时检查宿主机与容器中的原生执行。策略来源、作用范围及 `docker run` 参数见 [docker/README.md](docker/README.md)。
 
 ### 自动发布到 Docker Hub
 

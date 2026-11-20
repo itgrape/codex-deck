@@ -11,6 +11,7 @@ docker compose up -d --build
 ```bash
 docker run --rm \
   --security-opt seccomp=./docker/codex-seccomp.json \
+  --security-opt apparmor=unconfined \
   --security-opt no-new-privileges=true \
   codex-deck:local npm run smoke:native
 ```
@@ -20,6 +21,12 @@ docker run --rm \
 - `clone`：只额外允许包含 `CLONE_NEWUSER` 的调用，兼容 s390 参数顺序。
 - `unshare`、`setns`、`mount`、`umount2`、`pivot_root`、`sethostname`：供 bubblewrap 设置嵌套 namespace，内核仍执行用户身份和 capability 检查。
 
-这会扩大该容器可用的 namespace / mount 系统调用范围，不关闭整个 seccomp，不使用 privileged，不添加 SYS_ADMIN，不关闭 AppArmor，也不挂载 Docker socket。容器继续使用镜像中的非 root `node` 用户。默认策略的 Apache-2.0 许可证见 [SECCOMP-LICENSE](SECCOMP-LICENSE)。
+这会扩大该容器可用的 namespace / mount 系统调用范围，不关闭整个 seccomp，不使用 privileged，不添加 SYS_ADMIN，不挂载 Docker socket。AppArmor 主机上额外使用 `apparmor=unconfined`，仅让该容器脱离宿主机的 AppArmor 规则；宿主机 AppArmor 服务和其他容器仍保持原策略。这会减少该容器的一层防护，原生 Codex 沙箱、seccomp 和 no-new-privileges 仍生效。容器继续使用镜像中的非 root `node` 用户。默认策略的 Apache-2.0 许可证见 [SECCOMP-LICENSE](SECCOMP-LICENSE)。
 
 本机 Linux ARM64 / OrbStack 容器已验证：原生 app server 初始化、线程和技能列表、只读命令执行、只读写入拒绝及工作区写入成功；不调用模型。其他宿主机的内核、rootless 或 AppArmor 策略仍可能另有限制，可运行上面的 smoke 命令检查；不要据此自动放开宿主机或其他容器权限。
+
+## AppArmor 挂载错误
+
+若出现 `bwrap: Failed to make / slave: Permission denied`，说明原生命令未能建立挂载隔离，不能视为测试通过。Docker 的 `docker-default` AppArmor 策略也会阻止该操作，仅允许 seccomp 系统调用不足以解除 AppArmor 的拒绝。Compose 和 CI 已统一为此服务设置 `apparmor=unconfined`，无需修改 daemon.json、关闭宿主机 AppArmor 或添加 SYS_ADMIN。已有容器需重建加载新参数：`docker compose up -d --force-recreate`。
+
+诊断时检查 `docker info --format '{{json .SecurityOptions}}'` 和 smoke 输出的 LSM profile。上述参数在本机无 AppArmor 的 OrbStack 上可运行；Ubuntu CI 上仍需重跑 smoke 确认，不能用本机通过替代 CI 结果。参考 [Docker AppArmor 文档](https://docs.docker.com/engine/security/apparmor/)。

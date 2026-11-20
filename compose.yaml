@@ -9,6 +9,8 @@ services:
     init: false # The image already includes tini.
     security_opt:
       - seccomp=./docker/codex-seccomp.json
+      # docker-default denies bubblewrap mount propagation on AppArmor hosts.
+      - apparmor=unconfined
       - no-new-privileges:true
     ports:
       - "127.0.0.1:${PORT:-3030}:3030"

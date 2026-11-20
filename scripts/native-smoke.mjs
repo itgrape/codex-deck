@@ -15,6 +15,12 @@ const runtime = new CodexRuntime({
   codexHome,
 });
 try {
+  if (process.platform === "linux") {
+    const profile = await readFile("/proc/self/attr/current", "utf8").catch(
+      () => "unavailable",
+    );
+    console.log(`Native smoke environment: linux/${process.arch}, LSM profile: ${profile.trim()}`);
+  }
   const info = await runtime.initialize();
   assert.ok(info.userAgent);
   const threads = await runtime.request("thread/list", {
@@ -33,7 +39,10 @@ try {
     timeoutMs: 10_000,
     sandboxPolicy: { type: "readOnly" },
   });
-  assert.equal(command.exitCode, 0, command.stderr);
+  const hint = /Failed to make \/ slave|mount.*Permission denied/i.test(command.stderr)
+    ? "\nContainer mount isolation was denied. On AppArmor hosts, run this container with --security-opt apparmor=unconfined in addition to docker/codex-seccomp.json; see docker/README.md. This does not require changing the host-wide Docker profile."
+    : "";
+  assert.equal(command.exitCode, 0, command.stderr + hint);
   assert.match(command.stdout, /git version/);
   const probe = join(root, "sandbox-write-probe");
   const writeCommand = ["sh", "-c", 'printf sandbox-check > "$1"', "sh", probe];
