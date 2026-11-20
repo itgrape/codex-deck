@@ -1,0 +1,34 @@
+services:
+  codex-deck:
+    image: ${DOCKERHUB_USERNAME:-local}/codex-deck:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      args:
+        CODEX_VERSION: ${CODEX_VERSION:-0.170.0}
+        CC_CONNECT_VERSION: ${CC_CONNECT_VERSION:-1.5.2}
+    init: false # The image already includes tini.
+    security_opt:
+      - seccomp=./docker/codex-seccomp.json
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:${PORT:-3030}:3030"
+    environment:
+      DECK_TOKEN: ${DECK_TOKEN:?Set DECK_TOKEN in .env (at least 24 characters)}
+      DECK_ORIGIN: ${DECK_ORIGIN:-http://localhost:3030}
+      TZ: ${TZ:-Asia/Shanghai}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      FEISHU_APP_SECRET: ${FEISHU_APP_SECRET:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      QQ_BOT_APP_SECRET: ${QQ_BOT_APP_SECRET:-}
+      QQ_WS_URL: ${QQ_WS_URL:-ws://host.docker.internal:3001}
+      QQ_HTTP_URL: ${QQ_HTTP_URL:-}
+      QQ_ACCESS_TOKEN: ${QQ_ACCESS_TOKEN:-}
+      WEIXIN_BOT_TOKEN: ${WEIXIN_BOT_TOKEN:-}
+      WECOM_BOT_SECRET: ${WECOM_BOT_SECRET:-}
+    volumes:
+      - deck-data:/data
+      - ${WORKSPACE_DIR:-./.data/workspaces}:/workspaces
+    restart: unless-stopped
+    stop_grace_period: 20s
+volumes:
+  deck-data:

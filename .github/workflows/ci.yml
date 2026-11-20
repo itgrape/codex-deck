@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+  native:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm install -g @openai/codex@0.170.0
+      - run: npm run smoke:native
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: codex-deck:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test container and bundled CLIs
+        shell: bash
+        run: |
+          docker run --rm codex-deck:test codex --version
+          docker run --rm codex-deck:test cc-connect --version
+          docker run --rm -v "$PWD/test:/app/test:ro" codex-deck:test npm test
+          docker run --rm --security-opt seccomp=./docker/codex-seccomp.json --security-opt no-new-privileges=true codex-deck:test npm run smoke:native
+          docker run -d --name deck-test --security-opt seccomp=./docker/codex-seccomp.json --security-opt no-new-privileges=true -p 127.0.0.1:3030:3030 -e DECK_TOKEN=ci-smoke-test-token-123456789 codex-deck:test
+          trap 'docker logs deck-test; docker rm -f deck-test' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3030/healthz; then exit 0; fi
+            sleep 1
+          done
+          exit 1

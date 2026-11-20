@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Codex Deck · 你的 Codex 控制台</title>
+    <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div id="login" class="login-shell" hidden>
+      <form id="login-form" class="login-card">
+        <div class="login-brand">
+          <img class="brand-mark" src="/logo.svg" alt="" /><span
+            >codex<span class="brand-light">deck</span></span
+          >
+        </div>
+        <h1>让 Codex 随处可用。</h1>
+        <p>连接你的工作目录、能力和日常任务。</p>
+        <label
+          >访问令牌<input
+            name="token"
+            type="password"
+            required
+            autocomplete="current-password"
+            placeholder="输入 DECK_TOKEN 或启动日志中的令牌"
+        /></label>
+        <button class="primary" type="submit">进入控制台</button>
+        <p id="login-error" role="alert"></p>
+      </form>
+    </div>
+    <div id="shell" hidden>
+      <aside class="sidebar">
+        <a href="#overview" class="brand" aria-label="Codex Deck 首页"
+          ><img class="brand-mark" src="/logo.svg" alt="" /><span
+            >codex<span class="brand-light">deck</span></span
+          ></a
+        >
+        <div class="nav-caption">工作台</div>
+        <nav aria-label="工作台导航">
+          <a href="#overview" data-page="overview"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1.5" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" /></svg
+            >概览</a
+          ><a href="#chat" data-page="chat"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 11a8 8 0 0 1-8 8H7l-4 3V11a9 9 0 0 1 17 0Z" />
+              <path d="M8 9h7M8 13h5" /></svg
+            >会话</a
+          ><a href="#workspaces" data-page="workspaces"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 7V5a2 2 0 0 1 2-2h5l3 4h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
+              />
+              <path d="M3 8h18" /></svg
+            >工作目录</a
+          ><a href="#skills" data-page="skills"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z"
+              /></svg
+            >Skills</a
+          ><a href="#mcp" data-page="mcp"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8 3v5M16 3v5M5 8h14v3a7 7 0 0 1-14 0ZM12 18v4" /></svg
+            >MCP 服务</a
+          ><a href="#jobs" data-page="jobs"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 6v6l4 2" /></svg
+            >定时任务</a
+          >
+        </nav>
+        <div class="nav-caption">管理</div>
+        <nav aria-label="管理导航">
+          <a href="#im" data-page="im"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M16 4H4v11h3l3 3v-3h6Z" />
+              <path d="M19 8h3v12h-4l-3 2v-4" /></svg
+            >IM 通信</a
+          ><a href="#config" data-page="config"
+            ><svg
+              class="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="m9 3-1 3-3 1-2 4 2 3v4l4 2 3-1 3 1 4-2v-4l2-3-2-4-3-1-1-3Z"
+              />
+              <circle cx="12" cy="12" r="3" /></svg
+            >配置管理</a
+          >
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="runtime-card">
+            <div id="native-state" class="runtime-label">App Server 未连接</div>
+            <small>Codex Deck · v0.1.0</small>
+          </div>
+        </div>
+      </aside>
+      <div class="main-shell">
+        <header class="topbar">
+          <button id="menu" class="icon-button" aria-label="切换导航">
+            ☰
+          </button>
+          <div class="breadcrumb">
+            工作台<span>/</span><strong id="crumb">概览</strong>
+          </div>
+          <div class="topbar-right">
+            <span id="connection" class="badge">未连接会话</span>
+            <div class="account-menu">
+              <button class="avatar" id="account-toggle" type="button" aria-label="账户菜单" aria-expanded="false" aria-controls="account-popover">C</button>
+              <div class="account-popover" id="account-popover" hidden>
+                <button id="logout" type="button">退出登录</button>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main id="content" tabindex="-1"></main>
+        <footer>
+          <span>Codex Deck</span><span>Powered by Codex app server</span>
+        </footer>
+      </div>
+    </div>
+    <dialog id="modal">
+      <div class="dialog-head">
+        <h2 id="modal-title"></h2>
+        <button
+          type="button"
+          class="icon-button"
+          id="modal-close"
+          aria-label="关闭"
+        >
+          ×
+        </button>
+      </div>
+      <div id="modal-body"></div>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>

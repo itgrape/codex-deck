@@ -1,0 +1,25 @@
+{
+  "name": "codex-deck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A lightweight, self-hosted control plane for Codex app server",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch server/index.js",
+    "start": "node server/index.js",
+    "check": "node --check server/skills-zip.js && node --check public/im-config.js && node --check server/settings.js && node --check server/index.js && node --check server/app.js && node --check server/runtime.js && node --check server/store.js && node --check server/resources.js && node --check server/scheduler.js && node --check server/bridge.js && node --check public/app.js",
+    "test": "node --test test/*.test.js",
+    "smoke:native": "node scripts/native-smoke.mjs"
+  },
+  "dependencies": {
+    "buffer-crc32": "^1.0.0",
+    "croner": "^9.1.0",
+    "smol-toml": "^1.4.2",
+    "ws": "^8.18.3",
+    "yauzl": "^3.4.0",
+    "zod": "^4.1.12"
+  }
+}
